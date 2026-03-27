@@ -6,7 +6,7 @@ echo "Starting Django app..."
 python manage.py migrate
 
 # Collect static files (safe even if not used)
-python manage.py collectstatic --noinput || true
+python manage.py collectstatic --noinput
 
 # Start server
 exec "$@"
