@@ -4,4 +4,4 @@ from rest_framework.decorators import api_view
 
 @api_view(['GET'])
 def home(request):
-    return Response({"message": "Home page of Django with Swagger!"})
+    return Response({"message": "Home page of Django with Swagger! 2.0"})
