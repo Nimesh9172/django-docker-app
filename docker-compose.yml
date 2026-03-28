@@ -2,7 +2,7 @@ name: myapp
 
 services:
   web:
-    image: backendapp.azurecr.io/backendapp:latest
+    image: backendapp.azurecr.io/backendapp:${IMAGE_TAG:-latest}
     pull_policy: always
     container_name: django_app
     restart: always

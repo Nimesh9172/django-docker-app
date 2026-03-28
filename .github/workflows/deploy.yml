@@ -37,7 +37,8 @@ jobs:
           cd /opt/django-docker-app
           echo "${{ secrets.ACR_PASSWORD }}" | sudo docker login backendapp.azurecr.io \
             -u ${{ secrets.ACR_USERNAME }} --password-stdin
-          sudo docker compose pull
+          # Use the same tag CI just pushed so Docker always pulls this digest (avoids stale :latest cache).
+          sudo env IMAGE_TAG=${{ github.sha }} docker compose pull web
           sudo docker rm -f django_app || true
-          sudo docker compose up -d --force-recreate --no-deps web
+          sudo env IMAGE_TAG=${{ github.sha }} docker compose up -d --force-recreate --no-deps web
           sudo docker image prune -f
