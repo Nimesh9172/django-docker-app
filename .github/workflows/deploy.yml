@@ -35,6 +35,9 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /opt/django-docker-app
+          echo "${{ secrets.ACR_PASSWORD }}" | sudo docker login backendapp.azurecr.io \
+            -u ${{ secrets.ACR_USERNAME }} --password-stdin
           sudo docker compose pull
+          sudo docker rm -f django_app || true
           sudo docker compose up -d --force-recreate --no-deps web
           sudo docker image prune -f
