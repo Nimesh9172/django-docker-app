@@ -1,20 +1,21 @@
-version: '3.9'
-name: myapp  
+name: myapp
 
 services:
   web:
-    image: backendapp.azurecr.io/backendapp:latest   # ✅ from ACR
+    image: backendapp.azurecr.io/backendapp:latest
     pull_policy: always
     container_name: django_app
+    restart: always
     command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - static_volume:/app/staticfiles
     expose:
-      - "8000"   # ✅ internal only (no public port)
+      - "8000"
 
   nginx:
     image: nginx:latest
     container_name: nginx_server
+    restart: always
     ports:
       - "80:80"
       - "443:443"
