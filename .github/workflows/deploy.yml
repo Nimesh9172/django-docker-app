@@ -5,16 +5,19 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Login to ACR
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: backendapp.azurecr.io
         username: ${{ secrets.ACR_USERNAME }}
@@ -28,16 +31,23 @@ jobs:
         docker push backendapp.azurecr.io/backendapp:latest
 
     - name: Deploy to VM via SSH
-      uses: appleboy/ssh-action@v0.1.6
+      uses: appleboy/ssh-action@v1.2.5
       with:
         host: ${{ secrets.VM_IP }}
         username: ${{ secrets.VM_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script_stop: true
         script: |
-          cd /opt/django-docker-app
+          set -e
+          DEPLOY_DIR=/opt/django-docker-app
+          cd "$DEPLOY_DIR"
+          sudo git -C "$DEPLOY_DIR" -c safe.directory="$DEPLOY_DIR" fetch --no-tags --depth=1 \
+            "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            "+refs/heads/${{ github.ref_name }}:refs/remotes/origin/${{ github.ref_name }}"
+          sudo git -C "$DEPLOY_DIR" checkout -f "${{ github.ref_name }}"
+          sudo git -C "$DEPLOY_DIR" reset --hard "origin/${{ github.ref_name }}"
           echo "${{ secrets.ACR_PASSWORD }}" | sudo docker login backendapp.azurecr.io \
             -u ${{ secrets.ACR_USERNAME }} --password-stdin
-          # Use the same tag CI just pushed so Docker always pulls this digest (avoids stale :latest cache).
           sudo env IMAGE_TAG=${{ github.sha }} docker compose pull web
           sudo docker rm -f django_app || true
           sudo env IMAGE_TAG=${{ github.sha }} docker compose up -d --force-recreate --no-deps web
