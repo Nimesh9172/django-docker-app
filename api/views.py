@@ -3,8 +3,8 @@ from rest_framework.response import Response
 
 @api_view(['GET'])
 def hello(request):
-    return Response({"message": "Hello, Django with Swagger! version 2.0"})
+    return Response({"message": "Hello, Django with Swagger!"})
 
 @api_view(['GET'])
 def home(request):
-    return Response({"message": "Home page of Django with Swagger! 2.0"})
+    return Response({"message": "Home page of Django with Swagger!"})
