@@ -22,7 +22,9 @@ jobs:
 
     - name: Build and Push Docker Image
       run: |
-        docker build -t backendapp.azurecr.io/backendapp:latest .
+        docker build -t backendapp.azurecr.io/backendapp:${{ github.sha }} \
+                    -t backendapp.azurecr.io/backendapp:latest .
+        docker push backendapp.azurecr.io/backendapp:${{ github.sha }}
         docker push backendapp.azurecr.io/backendapp:latest
 
     - name: Deploy to VM via SSH
@@ -33,7 +35,6 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /opt/django-docker-app
-          sudo docker-compose down -v 
-          sudo docker-compose pull
-          sudo docker-compose down
-          sudo docker-compose up -d
+          sudo docker-compose pull          # pull the new latest
+          sudo docker-compose up -d --force-recreate --no-deps web
+          sudo docker image prune -f        # clean up old images
