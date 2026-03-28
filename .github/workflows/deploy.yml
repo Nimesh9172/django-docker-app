@@ -35,6 +35,6 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /opt/django-docker-app
-          sudo docker-compose pull          # pull the new latest
-          sudo docker-compose up -d --force-recreate --no-deps web
-          sudo docker image prune -f        # clean up old images
+          sudo docker compose pull
+          sudo docker compose up -d --force-recreate --no-deps web
+          sudo docker image prune -f
