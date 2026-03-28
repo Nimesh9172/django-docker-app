@@ -41,4 +41,5 @@ jobs:
           sudo env IMAGE_TAG=${{ github.sha }} docker compose pull web
           sudo docker rm -f django_app || true
           sudo env IMAGE_TAG=${{ github.sha }} docker compose up -d --force-recreate --no-deps web
+          sudo docker compose restart nginx
           sudo docker image prune -f
