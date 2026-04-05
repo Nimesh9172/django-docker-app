@@ -50,8 +50,5 @@ jobs:
             -u ${{ secrets.ACR_USERNAME }} --password-stdin
           sudo env IMAGE_TAG=${{ github.sha }} docker compose pull web
           sudo docker rm -f django_app || true
-          sudo env IMAGE_TAG=${{ github.sha }} docker compose up -d --force-recreate --no-deps web
-          # restart alone fails if nginx was never created; up -d creates/starts it, then restart reloads config + upstream
-          sudo docker compose up -d --no-deps nginx
-          sudo docker compose restart nginx
+          sudo env IMAGE_TAG=${{ github.sha }} docker compose up -d --force-recreate --no-deps --remove-orphans web
           sudo docker image prune -f
